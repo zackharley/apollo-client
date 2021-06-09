@@ -175,24 +175,28 @@ export class ObservableQuery<
     });
   }
 
-  public getCurrentResult(saveAsLastResult = true): ApolloQueryResult<TData> {
-    const {
-      lastResult,
-      options: {
-        fetchPolicy = "cache-first",
-      },
-    } = this;
-
-    const networkStatus =
-      this.queryInfo.networkStatus ||
+  public getNetworkStatus() {
+    const { lastResult } = this;
+    return this.queryInfo.networkStatus ||
       (lastResult && lastResult.networkStatus) ||
       NetworkStatus.ready;
+  }
 
+  public getLoading(networkStatus = this.getNetworkStatus()) {
+    return isNetworkRequestInFlight(networkStatus);
+  }
+
+  public getCurrentResult(saveAsLastResult = true): ApolloQueryResult<TData> {
+    const networkStatus = this.getNetworkStatus();
     const result = {
-      ...lastResult,
-      loading: isNetworkRequestInFlight(networkStatus),
+      ...this.lastResult,
       networkStatus,
+      loading: this.getLoading(networkStatus),
     } as ApolloQueryResult<TData>;
+
+    const {
+      fetchPolicy = "cache-first",
+    } = this.options;
 
     // If this.options.query has @client(always: true) fields, we cannot trust
     // diff.result, since it was read from the cache without running local
