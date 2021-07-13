@@ -432,29 +432,29 @@ describe('useLazyQuery Hook', () => {
 
       switch (++renderCount) {
         case 1:
-          expect(loading).toEqual(false);
+          expect(loading).toBe(false);
           expect(data).toBeUndefined();
           expect(previousData).toBeUndefined();
           setTimeout(execute);
           break;
         case 2:
-          expect(loading).toBeTruthy();
+          expect(loading).toBe(true);
           expect(data).toBeUndefined();
           expect(previousData).toBeUndefined();
           break;
         case 3:
-          expect(loading).toBeFalsy();
+          expect(loading).toBe(false);
           expect(data).toEqual(data1);
           expect(previousData).toBeUndefined();
           setTimeout(refetch!);
           break;
         case 4:
-          expect(loading).toBeTruthy();
+          expect(loading).toBe(true);
           expect(data).toEqual(data1);
           expect(previousData).toEqual(data1);
           break;
         case 5:
-          expect(loading).toBeFalsy();
+          expect(loading).toBe(false);
           expect(data).toEqual(data2);
           expect(previousData).toEqual(data1);
           break;
@@ -485,7 +485,7 @@ describe('useLazyQuery Hook', () => {
       }
     `;
 
-    const CAR_DATA_A4 = {
+    const data1 = {
       car: {
         make: 'Audi',
         model: 'A4',
@@ -493,7 +493,7 @@ describe('useLazyQuery Hook', () => {
       },
     };
 
-    const CAR_DATA_RS8 = {
+    const data2 = {
       car: {
         make: 'Audi',
         model: 'RS8',
@@ -504,56 +504,50 @@ describe('useLazyQuery Hook', () => {
     const mocks = [
       {
         request: { query: CAR_QUERY_BY_ID, variables: { id: 1 } },
-        result: { data: CAR_DATA_A4 },
+        result: { data: data1 },
       },
       {
         request: { query: CAR_QUERY_BY_ID, variables: { id: 2 } },
-        result: { data: CAR_DATA_RS8 },
+        result: { data: data2 },
       },
     ];
 
     let renderCount = 0;
     function App() {
-      const [execute, { loading, data, previousData }] = useLazyQuery(
+      const [execute, { loading, data, previousData, refetch }] = useLazyQuery(
         CAR_QUERY_BY_ID,
         { notifyOnNetworkStatusChange: true },
       );
 
+      refetch;
+
       switch (++renderCount) {
         case 1:
-          expect(loading).toEqual(false);
+          expect(loading).toBe(false);
           expect(data).toBeUndefined();
           expect(previousData).toBeUndefined();
-          setTimeout(() => execute(
-            {
-              variables: { id: 1 },
-            },
-          ));
+          setTimeout(() => execute({ variables: { id: 1 }}));
           break;
         case 2:
-          expect(loading).toBeTruthy();
+          expect(loading).toBe(true);
           expect(data).toBeUndefined();
           expect(previousData).toBeUndefined();
           break;
         case 3:
-          expect(loading).toBeFalsy();
-          expect(data).toEqual(CAR_DATA_A4);
+          expect(loading).toBe(false);
+          expect(data).toEqual(data1);
           expect(previousData).toBeUndefined();
-          setTimeout(() => execute(
-            {
-              variables: { id: 2 },
-            },
-          ));
+          setTimeout(() => refetch!({ id: 2 }));
           break;
         case 4:
-          expect(loading).toBeTruthy();
-          expect(data).toEqual(CAR_DATA_A4);
-          expect(previousData).toEqual(CAR_DATA_A4);
+          expect(loading).toBe(true);
+          expect(data).toEqual(undefined);
+          expect(previousData).toEqual(data1);
           break;
         case 5:
-          expect(loading).toBeFalsy();
-          expect(data).toEqual(CAR_DATA_RS8);
-          expect(previousData).toEqual(CAR_DATA_A4);
+          expect(loading).toBe(false);
+          expect(data).toEqual(data2);
+          expect(previousData).toEqual(data1);
           break;
         default: // Do nothing
       }

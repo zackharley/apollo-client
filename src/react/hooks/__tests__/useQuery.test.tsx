@@ -947,28 +947,25 @@ describe('useQuery Hook', () => {
       const Component = () => {
         const { loading, error, refetch, data, networkStatus } = useQuery(
           query,
-          {
-            onError,
-            notifyOnNetworkStatusChange: true
-          }
+          { onError, notifyOnNetworkStatusChange: true },
         );
 
         switch (++renderCount) {
           case 1:
-            expect(loading).toBeTruthy();
+            expect(loading).toBe(true);
             break;
           case 2:
-            expect(loading).toBeFalsy();
+            expect(loading).toBe(false);
             expect(error).toBeDefined();
             expect(error!.message).toEqual('Oh no!');
             onErrorPromise.then(() => refetch());
             break;
           case 3:
-            expect(loading).toBeTruthy();
+            expect(loading).toBe(true);
             expect(networkStatus).toBe(NetworkStatus.refetch);
             break;
           case 4:
-            expect(loading).toBeFalsy();
+            expect(loading).toBe(false);
             expect(data).toEqual(resultData);
             break;
           default: // Do nothing
@@ -2960,7 +2957,7 @@ describe('useQuery Hook', () => {
           id: 1,
           make: 'Venturi',
           __typename: 'Car',
-        }
+        },
       };
 
       const data2 = {
@@ -2968,7 +2965,7 @@ describe('useQuery Hook', () => {
           id: 2,
           make: 'Wiesmann',
           __typename: 'Car',
-        }
+        },
       };
 
       const mocks = [
@@ -2984,23 +2981,23 @@ describe('useQuery Hook', () => {
 
         switch (++renderCount) {
           case 1:
-            expect(loading).toBeTruthy();
+            expect(loading).toBe(true);
             expect(data).toBeUndefined();
             expect(previousData).toBeUndefined();
             break;
           case 2:
-            expect(loading).toBeFalsy();
+            expect(loading).toBe(false);
             expect(data).toEqual(data1);
             expect(previousData).toBeUndefined();
             setTimeout(refetch);
             break;
           case 3:
-            expect(loading).toBeTruthy();
+            expect(loading).toBe(true);
             expect(data).toEqual(data1);
             expect(previousData).toEqual(data1);
             break;
           case 4:
-            expect(loading).toBeFalsy();
+            expect(loading).toBe(false);
             expect(data).toEqual(data2);
             expect(previousData).toEqual(data1);
             break;
