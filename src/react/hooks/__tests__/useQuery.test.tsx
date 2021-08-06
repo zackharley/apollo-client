@@ -2183,9 +2183,21 @@ describe('useQuery Hook', () => {
       expect(result.current.data).toBe(undefined);
       expect(result.current.networkStatus).toBe(NetworkStatus.loading);
 
+      const updates = result.all.length;
       await waitForNextUpdate();
+      expect(result.all.length - updates).toBe(2);
       // waitForUpdate seems to miss the erroring render
+      const previous = result.all[result.all.length - 2];
+      if (previous instanceof Error) {
+        throw previous;
+      }
+
+      expect(previous.loading).toBe(true);
+      expect(previous.error).toBe(undefined);
+      expect(previous.data).toBe(undefined);
+
       expect(result.current.loading).toBe(true);
+      expect(result.current.error).toBe(undefined);
       expect(result.current.data).toBe(undefined);
       expect(result.current.networkStatus).toBe(NetworkStatus.refetch);
 
@@ -2240,8 +2252,19 @@ describe('useQuery Hook', () => {
       expect(result.current.data).toBe(undefined);
       expect(result.current.networkStatus).toBe(NetworkStatus.loading);
 
+      const updates = result.all.length;
       await waitForNextUpdate();
+      expect(result.all.length - updates).toBe(2);
       // waitForUpdate seems to miss the erroring render
+      const previous = result.all[result.all.length - 2];
+      if (previous instanceof Error) {
+        throw previous;
+      }
+
+      expect(previous.loading).toBe(true);
+      expect(previous.error).toBe(undefined);
+      expect(previous.data).toBe(undefined);
+
       expect(result.current.loading).toBe(true);
       expect(result.current.data).toBe(undefined);
       expect(result.current.networkStatus).toBe(NetworkStatus.refetch);
