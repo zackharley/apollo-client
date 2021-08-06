@@ -1,6 +1,6 @@
 ## Apollo Client 3.4.6 (not yet released)
 
-## Improvements
+### Improvements
 
 - Reevaluate `window.fetch` each time `HttpLink` uses it, if not configured using `options.fetch`. This change enables a variety of strategies for instrumenting `window.fetch`, without requiring those strategies to run before `@apollo/client/link/http` is first imported. <br/>
   [@benjamn](https://github.com/benjamn) in [#8603](https://github.com/apollographql/apollo-client/pull/8603)
