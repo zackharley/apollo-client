@@ -182,17 +182,21 @@ describe('[queries] loading', () => {
       class extends React.Component<ChildProps<Vars, Data, Vars>> {
         componentDidUpdate(prevProps: ChildProps<Vars, Data, Vars>) {
           const { data } = this.props;
-          // variables changed, new query is loading, but old data is still there
-          if (count === 1) {
-            if (data!.loading) {
-              expect(data!.networkStatus).toBe(2);
-              expect(data!.allPeople).toBeUndefined();
-            } else {
-              expect(prevProps.data!.loading).toBe(true);
-              expect(data!.networkStatus).toBe(7);
-              expect(data!.allPeople).toEqual(data2.allPeople);
-              done = true;
+          try {
+            // variables changed, new query is loading, but old data is still there
+            if (count === 1) {
+              if (data!.loading) {
+                expect(data!.networkStatus).toBe(2);
+                expect(data!.allPeople).toBeUndefined();
+              } else {
+                expect(prevProps.data!.loading).toBe(true);
+                expect(data!.networkStatus).toBe(7);
+                expect(data!.allPeople).toEqual(data2.allPeople);
+                done = true;
+              }
             }
+          } catch (err) {
+            reject(err);
           }
         }
         render() {
@@ -592,25 +596,30 @@ describe('[queries] loading', () => {
       })(
         class extends React.Component<ChildProps<Props, Data, Vars>> {
           render() {
-            if (count === 0) {
-              expect(this.props.data!.loading).toBeTruthy(); // has initial data
+            try {
+              if (count === 0) {
+                expect(this.props.data!.loading).toBeTruthy(); // has initial data
+              }
+
+              if (count === 1) {
+                expect(this.props.data!.loading).toBeFalsy();
+                setTimeout(() => {
+                  this.props.setFirst(2);
+                });
+              }
+
+              if (count === 2) {
+                expect(this.props.data!.loading).toBeTruthy(); // on variables change
+              }
+
+              if (count === 3) {
+                // new data after fetch
+                expect(this.props.data!.loading).toBeFalsy();
+              }
+            } catch (err) {
+              reject(err);
             }
 
-            if (count === 1) {
-              expect(this.props.data!.loading).toBeFalsy();
-              setTimeout(() => {
-                this.props.setFirst(2);
-              });
-            }
-
-            if (count === 2) {
-              expect(this.props.data!.loading).toBeTruthy(); // on variables change
-            }
-
-            if (count === 3) {
-              // new data after fetch
-              expect(this.props.data!.loading).toBeFalsy();
-            }
             count++;
 
             return null;
@@ -706,27 +715,32 @@ describe('[queries] loading', () => {
           class extends React.Component<ChildProps<Props, Data, Vars>> {
             render() {
               const { props } = this;
-              if (count === 0) {
-                expect(props.data!.loading).toBeTruthy();
+              try {
+                if (count === 0) {
+                  expect(props.data!.loading).toBeTruthy();
+                }
+
+                if (count === 1) {
+                  expect(props.data!.loading).toBeFalsy(); // has initial data
+                  expect(props.data!.allPeople).toEqual(data.allPeople);
+                  setTimeout(() => {
+                    this.props.setFirst(2);
+                  });
+                }
+
+                if (count === 2) {
+                  expect(props.data!.loading).toBeTruthy(); // on variables change
+                }
+
+                if (count === 3) {
+                  // new data after fetch
+                  expect(props.data!.loading).toBeFalsy();
+                  expect(props.data!.allPeople).toEqual(data.allPeople);
+                }
+              } catch (err) {
+                reject(err);
               }
 
-              if (count === 1) {
-                expect(props.data!.loading).toBeFalsy(); // has initial data
-                expect(props.data!.allPeople).toEqual(data.allPeople);
-                setTimeout(() => {
-                  this.props.setFirst(2);
-                });
-              }
-
-              if (count === 2) {
-                expect(props.data!.loading).toBeTruthy(); // on variables change
-              }
-
-              if (count === 3) {
-                // new data after fetch
-                expect(props.data!.loading).toBeFalsy();
-                expect(props.data!.allPeople).toEqual(data.allPeople);
-              }
               count++;
               return null;
             }
